@@ -11,6 +11,10 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.nfcreadersample.databinding.ActivityMainBinding
+import java.math.BigInteger
+
+
+
 
 
 class MainActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
@@ -155,27 +159,21 @@ class MainActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
 
     //conver the array of byte to hexadecimal String
     fun ByteArrayToHexString(inarray: ByteArray): String? {
-        var i: Int
-        var j: Int
-        var `in`: Int
-        val hex =
-            arrayOf("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F")
-        var out = ""
-        j = 0
-        while (j < inarray.size) {
-            `in` = inarray[j].toInt() and 0xff
-            i = `in` shr 4 and 0x0f
-            out += hex[i]
-            i = `in` and 0x0f
-            out += hex[i]
-            ++j
-        }
-        return out
+
+        val biStr = BigInteger(inarray)
+        val binary = biStr.toString(2)
+        val hexadecimal = biStr.toString(16).uppercase()
+        val decimal = biStr.toString(10)
+
+        Log.d(TAG, "ByteArrayToHexString binary = $binary")
+        Log.d(TAG, "ByteArrayToHexString hex = $hexadecimal")
+        Log.d(TAG, "ByteArrayToHexString dec = $decimal")
+
+        return hexadecimal
     }
 
     override fun onTagDiscovered(tag: Tag?) {
         Log.d(TAG, "onTagDiscovered tag = $tag")
     }
-
 
 }
