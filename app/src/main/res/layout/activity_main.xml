@@ -73,24 +73,26 @@
             <TextView
                 android:layout_column="0"
                 android:padding="10dip"
+                android:gravity="center"
+                android:ems="5"
                 android:textStyle="bold"
                 android:layout_gravity="center"
                 android:text="UID" />
 
             <TextView
                 android:layout_column="1"
-                android:gravity="right"
                 android:padding="10dip"
                 android:textStyle="bold"
-                android:layout_gravity="center"
+                android:ems="8"
+                android:gravity="center"
                 android:text="Technologies" />
 
             <TextView
                 android:layout_column="2"
-                android:gravity="right"
+                android:gravity="center"
                 android:padding="10dip"
                 android:textStyle="bold"
-                android:layout_gravity="center"
+                android:ems="8"
                 android:text="Apdu response" />
         </TableRow>
     </TableLayout>
