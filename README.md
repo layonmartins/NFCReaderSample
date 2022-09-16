@@ -9,8 +9,8 @@
 ## How to test?
 * Open the app
 * Approach your card or tag NFC or RFID behind the smartphone
-* The NFC ID will be printed on screen
+* The NFC Infos will be printed on screen table
 
-<img src="nfcreaded.jpeg" width="50%"> <img src="nfcnotwork.png" width="50%">
+<img src="screenshot.png" width="50%">
 
 
