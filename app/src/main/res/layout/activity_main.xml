@@ -25,17 +25,18 @@
 
 
         <TextView
+            android:id="@+id/reading"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="45dp"
             android:gravity="center|bottom"
-            android:text="RFID Reader"
+            android:text="Reading..."
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/reading"
+            android:id="@+id/title2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="20dp"
@@ -54,15 +55,71 @@
 
     </androidx.cardview.widget.CardView>
 
-
-    <TextView
-        android:id="@+id/logTextView"
-        android:layout_width="wrap_content"
+    <TableLayout
+        android:id="@+id/tableHead"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Logs"
+        android:stretchColumns="1"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rfidCardView">
+
+        <TableRow android:background="#CDCDCD">
+
+            <TextView
+                android:layout_column="0"
+                android:padding="10dip"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:text="UID" />
+
+            <TextView
+                android:layout_column="1"
+                android:gravity="right"
+                android:padding="10dip"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:text="Technologies" />
+
+            <TextView
+                android:layout_column="2"
+                android:gravity="right"
+                android:padding="10dip"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:text="Apdu response" />
+        </TableRow>
+    </TableLayout>
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rfidCardView" />
+        app:layout_constraintTop_toBottomOf="@id/tableHead">
+
+        <TableLayout
+            android:id="@+id/table"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:stretchColumns="1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rfidCardView">
+
+
+        </TableLayout>
+    </ScrollView>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

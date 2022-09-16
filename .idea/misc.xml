@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../layout/custom_preview.xml" value="0.25679347826086957" />
         <entry key="app/src/main/res/drawable/ic_baseline_wifi_tethering_126.xml" value="0.228" />
         <entry key="app/src/main/res/drawable/ic_baseline_wifi_tethering_24.xml" value="0.228" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />

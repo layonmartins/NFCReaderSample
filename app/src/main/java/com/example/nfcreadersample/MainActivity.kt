@@ -2,20 +2,23 @@ package com.example.nfcreadersample
 
 import android.app.PendingIntent
 import android.content.Intent
-import android.content.pm.PackageManager
+import android.graphics.Color
 import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.nfc.tech.IsoDep
 import android.os.Bundle
 import android.util.Log
-import android.view.View
+import android.view.Gravity
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
+import android.widget.Button
+import android.widget.TableLayout
+import android.widget.TableRow
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.nfcreadersample.databinding.ActivityMainBinding
 import java.math.BigInteger
-
-
-
 
 
 class MainActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
@@ -24,6 +27,7 @@ class MainActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
     private var nfcAdapter: NfcAdapter? = null
     private val TAG = "layon.f"
     private lateinit var pendingIntent : PendingIntent
+    private var tagDiscoveryCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +41,51 @@ class MainActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
         checkIfHasNFCHardware()
     }
 
+    private fun addRowOnTable(s1 : String, s2 : String, s3: String) {
+        /* Create a new row to be added. */
+        val tr = TableRow(this)
+        tr.layoutParams = TableRow.LayoutParams(
+            TableRow.LayoutParams.MATCH_PARENT,
+            TableRow.LayoutParams.WRAP_CONTENT
+        )
+        /* Create a TextView to be the row-content. */
+        val t1 = TextView(this)
+        t1.text = s1
+        t1.layoutParams = TableRow.LayoutParams(0).apply {
+            this.gravity = Gravity.CENTER
+        }
+
+        val t2 = TextView(this)
+        t2.text = s2
+        t2.layoutParams = TableRow.LayoutParams(1).apply {
+            this.gravity = Gravity.CENTER
+        }
+
+        val t3 = TextView(this)
+        t3.text = s3
+        t3.layoutParams = TableRow.LayoutParams(2).apply {
+            this.gravity = Gravity.CENTER
+        }
+
+        /* Add TextView to row. */
+        tr.addView(t1)
+        tr.addView(t2)
+        tr.addView(t3)
+
+        /* Add row to TableLayout. */
+        if(tagDiscoveryCount % 2 == 0){
+            tr.setBackgroundColor(Color.parseColor("#FFECECEC"))
+        }
+
+        binding.table.addView(
+            tr,
+            TableLayout.LayoutParams(
+                TableLayout.LayoutParams.MATCH_PARENT,
+                TableLayout.LayoutParams.WRAP_CONTENT
+            )
+        )
+    }
+
     override fun onPause() {
         super.onPause()
         nfcAdapter?.disableForegroundDispatch(this)
@@ -47,12 +96,21 @@ class MainActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
         if (nfcAdapter == null || (nfcAdapter?.isEnabled == false)) {
             //NFC is not available or enabled
-            binding.reading.text = "NFC is not available or enabled"
+            binding.title2.text = "NFC is not available or enabled"
         } else {
             //setupNfcReaderModeBackground() //setup the foreground reader
-            Log.d(TAG, "device can read NFC")
+            startBlinkEffect(binding.reading)
             enableReadTagByOnTagDiscovered()
         }
+    }
+
+    fun startBlinkEffect(text : TextView) {
+        val animation = AlphaAnimation(0.1f, 1.0f).also {
+            it.duration = 250
+            it.repeatMode = Animation.REVERSE
+            it.repeatCount = Animation.INFINITE
+        }
+        text.startAnimation(animation)
     }
 
     private fun enableReadTagByOnNewIntent() {
@@ -174,23 +232,33 @@ class MainActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
 
     override fun onTagDiscovered(tag: Tag?) {
         Log.d("layon.f", "onTagDiscovered: $tag")
+        tag?.let {
+            tagDiscoveryCount++
+            val id = Utils.toHex(it.id)
+            var responseByte : ByteArray? = null
+            var responseString : String = "           -           "
+            var techs : String = ""
+            it.techList.forEach {
+                techs = "$techs${if(techs.isNotEmpty()) "," else ""} ${it.split(".").last()}"
+            }
 
-        val isoDep = IsoDep.get(tag)
-        isoDep.connect()
-        val response = isoDep.transceive(
-            Utils.hexStringToByteArray(
-                "00A4040007F0010203040506"
-                //"00A4040007A0000002471001"
-            )
-        )
-        runOnUiThread {
-
-            binding.logTextView.append(
-                "\nUID: ${Utils.toHex(tag?.id!!)}" +
-                        " Card response: ${String(response)}"
-            )
+            val isoDep = IsoDep.get(tag)
+            try {
+                isoDep.connect()
+                responseByte = isoDep.transceive(
+                    Utils.hexStringToByteArray(
+                        "00A4040007F0010203040506"
+                    )
+                )
+                responseString = String(responseByte)
+                isoDep.close()
+            } catch (e: Exception) {
+                Log.d("layon.f", "onTagDiscovered error: $e")
+            } finally {
+                runOnUiThread {
+                    addRowOnTable(id, techs, responseString)
+                }
+            }
         }
-        isoDep.close()
     }
-
 }
