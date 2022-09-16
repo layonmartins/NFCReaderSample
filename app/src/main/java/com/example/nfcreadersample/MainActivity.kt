@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
 import android.nfc.Tag
+import android.nfc.tech.IsoDep
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -34,7 +35,6 @@ class MainActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
     override fun onResume() {
         super.onResume()
         checkIfHasNFCHardware()
-        checkIfDeviceCanEmulateHostNFCTag()
     }
 
     override fun onPause() {
@@ -43,31 +43,35 @@ class MainActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
         nfcAdapter?.disableReaderMode(this)
     }
 
-    fun checkIfDeviceCanEmulateHostNFCTag(){
-        if(packageManager.hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION)){
-            binding.hasNfcHostEmulatorTextView.visibility = View.VISIBLE
-        }
-    }
-
     fun checkIfHasNFCHardware(){
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
         if (nfcAdapter == null || (nfcAdapter?.isEnabled == false)) {
             //NFC is not available or enabled
-            binding.hasNfcTextView.text = "NFC is not available or enabled"
-            binding.imageView.visibility = View.GONE
+            binding.reading.text = "NFC is not available or enabled"
         } else {
             //setupNfcReaderModeBackground() //setup the foreground reader
             Log.d(TAG, "device can read NFC")
-
-            //If device can read NFC
-            pendingIntent = PendingIntent.getActivity(
-                this,
-                0,
-                Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
-                PendingIntent.FLAG_MUTABLE
-            )
-            nfcAdapter?.enableForegroundDispatch(this, pendingIntent, null, null)
+            enableReadTagByOnTagDiscovered()
         }
+    }
+
+    private fun enableReadTagByOnNewIntent() {
+         pendingIntent = PendingIntent.getActivity(
+             this,
+             0,
+             Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+             PendingIntent.FLAG_MUTABLE
+         )
+         nfcAdapter?.enableForegroundDispatch(this, pendingIntent, null, null)
+    }
+
+    private fun enableReadTagByOnTagDiscovered() {
+        nfcAdapter?.enableReaderMode(
+            this, this,
+            NfcAdapter.FLAG_READER_NFC_A or
+                    NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK,
+            null
+        )
     }
 
     //used to make the tag opens on background
@@ -126,10 +130,6 @@ class MainActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
             uid?.let {
                 val uidHex = ByteArrayToHexString(uid)
                 Log.d(TAG, "resolveIntent uidHex = $uidHex")
-                binding.hasNfcIdTextView.apply {
-                    visibility = View.VISIBLE
-                    text = "UID: $uidHex"
-                }
             }
             Log.d(TAG, "resolveIntent uid = $uid")
 
@@ -173,7 +173,24 @@ class MainActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
     }
 
     override fun onTagDiscovered(tag: Tag?) {
-        Log.d(TAG, "onTagDiscovered tag = $tag")
+        Log.d("layon.f", "onTagDiscovered: $tag")
+
+        val isoDep = IsoDep.get(tag)
+        isoDep.connect()
+        val response = isoDep.transceive(
+            Utils.hexStringToByteArray(
+                "00A4040007F0010203040506"
+                //"00A4040007A0000002471001"
+            )
+        )
+        runOnUiThread {
+
+            binding.logTextView.append(
+                "\nUID: ${Utils.toHex(tag?.id!!)}" +
+                        " Card response: ${String(response)}"
+            )
+        }
+        isoDep.close()
     }
 
 }
