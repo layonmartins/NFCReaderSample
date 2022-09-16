@@ -12,7 +12,6 @@ import android.util.Log
 import android.view.Gravity
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
-import android.widget.Button
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
@@ -74,7 +73,7 @@ class MainActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
 
         /* Add row to TableLayout. */
         if(tagDiscoveryCount % 2 == 0){
-            tr.setBackgroundColor(Color.parseColor("#FFECECEC"))
+            tr.setBackgroundColor(resources.getColor(R.color.tableRow, null))
         }
 
         binding.table.addView(

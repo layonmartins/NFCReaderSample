@@ -11,4 +11,5 @@
     <color name="gray1">#1C1C1C</color>
     <color name="gray2">#AFAFAF</color>
     <color name="whiteBlue">#B8C8FF</color>
+    <color name="tableRow">#FFECECEC</color>
 </resources>
